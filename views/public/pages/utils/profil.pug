@@ -1,0 +1,226 @@
+doctype html
+html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-default', data-assets-path='../../assets/', data-template='vertical-menu-template-free')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0')
+    title Samarqand davlat universiteti
+    meta(name='description', content='')
+    // Favicon
+    link(rel='icon', type='image/x-icon', href='../../assets/img/favicon/favicon.ico')
+    // Fonts
+    link(rel='preconnect', href='https://fonts.googleapis.com')
+    link(rel='preconnect', href='https://fonts.gstatic.com', crossorigin='')
+    link(href='https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap', rel='stylesheet')
+    // Icons. Uncomment required icon fonts
+    link(rel='stylesheet', href='../../asserts/userUI/assets/vendor/fonts/boxicons.css')
+    // Core CSS
+    link.template-customizer-core-css(rel='stylesheet', href='../../asserts/userUI/assets/vendor/css/core.css')
+    link.template-customizer-theme-css(rel='stylesheet', href='../../asserts/userUI/assets/vendor/css/theme-default.css')
+    link(rel='stylesheet', href='../../asserts/userUI/assets/css/demo.css')
+    // Vendors CSS
+    link(rel='stylesheet', href='../../asserts/userUI/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')
+    // Page CSS
+    // Helpers
+    script(src='../../asserts/userUI/assets/vendor/js/helpers.js')
+    // ! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section
+    // ? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.
+    script(src='../../asserts/userUI/assets/js/config.js')
+  body
+    // Layout wrapper
+    .layout-wrapper.layout-content-navbar
+      .layout-container
+        // Menu
+        aside#layout-menu.layout-menu.menu-vertical.menu.bg-menu-theme
+          .app-brand.demo
+            a.app-brand-link(href='profil')
+              span.app-brand-logo.demo
+            h5.menu-text.fw-bolder.ms-2
+              a.app-brand-link(href='profil')
+                | Sam DUHPPQTMM
+              a.layout-menu-toggle.menu-link.text-large.ms-auto.d-block.d-xl-none(href='javascript:void(0);')
+                i.bx.bx-chevron-left.bx-sm.align-middle
+          .menu-inner-shadow
+          ul.menu-inner.py-1
+            // Dashboard
+            li.menu-item
+              a.menu-link(href='#')
+                i.menu-icon.tf-icons.bx.bx-home-circle
+                div(data-i18n='Analytics') Asosiy sahifa
+        // / Menu
+        // Layout container
+        .layout-page
+          // Navbar
+          nav#layout-navbar.layout-navbar.container-xxl.navbar.navbar-expand-xl.navbar-detached.align-items-center.bg-navbar-theme
+            .layout-menu-toggle.navbar-nav.align-items-xl-center.me-3.me-xl-0.d-xl-none
+              a.nav-item.nav-link.px-0.me-xl-4(href='javascript:void(0)')
+                i.bx.bx-menu.bx-sm
+            #navbar-collapse.navbar-nav-right.d-flex.align-items-center
+              ul.navbar-nav.flex-row.align-items-center.ms-auto
+                // Place this tag where you want the button to render.
+                // User
+                li.nav-item.navbar-dropdown.dropdown-user.dropdown
+                  a.nav-link.dropdown-toggle.hide-arrow(href='javascript:void(0);', data-bs-toggle='dropdown')
+                    .avatar.avatar-online
+                      img.w-px-40.h-auto.rounded-circle(src=user.avatar?user.avatar:'../../asserts/userUI/assets/img/avatars/1.png', alt='')
+                  ul.dropdown-menu.dropdown-menu-end
+                    li
+                      a.dropdown-item(href='#')
+                        .d-flex
+                          .flex-shrink-0.me-3
+                            .avatar.avatar-online
+                              img.w-px-40.h-auto.rounded-circle(src=user.avatar?user.avatar:'../../asserts/userUI/assets/img/avatars/1.png', alt='')
+                          .flex-grow-1
+                            span.fw-semibold.d-block Bobomalikov
+                            small.text-muted Abduaziz
+                    li
+                      .dropdown-divider
+                    li
+                      a.dropdown-item(href='#')
+                        i.bx.bx-user.me-2
+                        span.align-middle Shaxsiy malumotlar.
+                    li
+                      .dropdown-divider
+                    li
+                      a.dropdown-item(href='/signout')
+                        i.bx.bx-power-off.me-2
+                        span.align-middle Tizimdan chiqish
+                // / User
+          // / Navbar
+          // Content wrapper
+          .content-wrapper
+            // Content
+            .container-xxl.flex-grow-1.container-p-y
+              h4.fw-bold.py-3.mb-4
+                span.text-muted.fw-light Sozlamalar /
+                |  Profil
+              .row
+                .col-md-12
+                  .card.mb-4
+                    h5.card-header Shaxsiy malumotlaringiz
+                    // Account
+                    .card-body
+                      .d-flex.align-items-start.align-items-sm-center.gap-4
+                        img#uploadedAvatar.d-block.rounded(src=user.avatar?user.avatar:'../../asserts/userUI/assets/img/avatars/1.png', alt='user-avatar', height='100', width='100')
+                        if !user.avatar
+                            .button-wrapper
+                            label.btn.btn-primary.me-2.mb-4(for='upload', tabindex='0')
+                                span.d-none.d-sm-block O&apos;z suratingizni yuklang
+                                i.bx.bx-upload.d-block.d-sm-none
+                                input#upload.account-file-input(type='file', hidden='', accept='image/png, image/jpeg')
+                            button.btn.btn-outline-secondary.account-image-reset.mb-4(type='button')
+                                i.bx.bx-reset.d-block.d-sm-none
+                                span.d-none.d-sm-block qayta belgilash
+                            p.text-muted.mb-0
+                                | Ruxsat etilgan fayl formatlari: JPG, GIF yoki PNG. Maksimal hajmi
+                                | 1.5MB .
+                    hr.my-0
+                    .card-body
+                  
+                      form#formAccountSettings(method='POST', onsubmit='return false')
+                        .row
+                          .mb-3.col-md-6
+                            if !user.firstName
+                                label.form-label(for='firstName') Ismingiz
+                                input#firstName.form-control(type='text', name='firstName', value='', autofocus='')
+                            else
+                                p 
+                                    b Ismingiz : 
+                                    | #{user.firstName}
+                          .mb-3.col-md-6
+                            if  !user.lastName
+                                label.form-label(for='lastName') Familyangiz
+                                input#lastName.form-control(type='text', name='lastName', value='')
+                            else
+                                p 
+                                    b Familyangiz : 
+                                    | #{user.lastName}
+                          .mb-3
+                            if  !user.direction
+                                label.form-label(for='defaultSelect') Yo&apos;nalishni tanlang
+                                select#defaultSelect.form-select
+                                    option Yo&apos;nalishni tanlang
+                                    option(value='1') Defektologiya (logopediya)
+                                    option(value='2') Amaliy psixologiya
+                                    option(value='3') Maktabgacha talim tashkilotining tarbiyachisi
+                                    option(value='3') Pedagogik qayta tayorlov
+                            else 
+                                p 
+                                    b Tanlagan yo&apos;nalish: 
+                                    | #{user.direction}
+                          // File input
+                          .card
+                            h5.card-header Hujjatlar
+                            .card-body
+                              .mb-3
+                                if !user.passport 
+                                    label.form-label(for='passportFile') Pasportingizni yuklang:
+                                    input#passportFile.form-control(type='file', accept='.pdf')
+                                    p.text-muted.mb-0
+                                    | Pasportingizni pdf ko&apos;rinishda yuklang. (oldi va orqa tomlari
+                                    | bo&apos;lishi talab etiladi).
+                                else 
+                                    button.btn.btn-info.me-1(type='submit' onclick=`downloadFile('/download/${user.passport}')`)
+                                        i.bx.bxs-download
+                                    | Pasportingizni pdf ko&apos;rinishda yuklab olishingiz mumkin
+                              .mb-3
+                                if !user.diplom
+                                    label.form-label(for='diplomaFile') Diplomingizni yuklang:
+                                    input#diplomaFile.form-control(type='file', accept='.pdf')
+                                    p.text-muted.mb-0 Diplomingizni pdf ko&apos;rinishda yuklang.
+                                else 
+                                    button.btn.btn-warning.me-1(type='submit' onclick=`downloadFile('/download/${user.diplom}')`)
+                                        i.bx.bxs-download
+                                    | Diplomingizni pdf ko&apos;rinishda yuklab olishingiz mumkin
+                              .mb-3
+                                if !user.ilova
+                                    label.form-label(for='attachmentFile' ) Diplomingizni ilovasini yuklang:
+                                    input#attachmentFile.form-control(type='file', accept='.pdf')
+                                    p.text-muted.mb-0
+                                    | Pasportingizni pdf ko&apos;rinishda yuklang. (ilovaning barcha
+                                    | sahifalari bo&apos;lishi talab etiladi).
+                                else 
+                                    button.btn.btn-secondary.me-1(type='submit' onclick=`downloadFile('/download/${user.ilova}')`)
+                                        i.bx.bxs-download
+                                    | Diplomingizni ilovasini pdf ko&apos;rinishda yuklab olishingiz mumkin
+                            if user.firstName || user.lastName || user.direction || user.passport || user.diplom || user.ilova
+                                p.text-danger.text-center  Ma'lumotlaringizni  xato kirgizgan bo'lsangiz, ushbu raqamga telefon qiling: +998916664315
+                        .mt-2
+                            if !user.firstName || !user.lastName || !user.direction || !user.passport || !user.diplom || !user.ilova
+                                button#save.btn.btn-primary.me-2(type='submit') Saqlash
+                    // /Account
+            // / Content
+            // Footer
+            footer.content-footer.footer.bg-footer-theme
+              .container-xxl.d-flex.flex-wrap.justify-content-between.py-2.flex-md-row.flex-column
+                .mb-2.mb-md-0
+                  | &copy;
+                  script.
+                    document.write(new Date().getFullYear());
+                  |              , made with Abdusoft
+                div
+                  // <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
+                  a.footer-link.me-4(href='#', target='_blank') More Themes
+                  a.footer-link.me-4(href='#', target='_blank') Documentation
+                  a.footer-link.me-4(href='#', target='_blank') Support
+            // / Footer
+            .content-backdrop.fade
+          // Content wrapper
+        // / Layout page
+      // Overlay
+      .layout-overlay.layout-menu-toggle
+    // / Layout wrapper
+    // Core JS
+    // build:js assets/vendor/js/core.js
+    script(src='../../asserts/userUI/assets/vendor/libs/jquery/jquery.js')
+    script(src='../../asserts/userUI/assets/vendor/libs/popper/popper.js')
+    script(src='../../asserts/userUI/assets/vendor/js/bootstrap.js')
+    script(src='../../asserts/userUI/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')
+    script(src='../../asserts/userUI/assets/vendor/js/menu.js')
+    // endbuild
+    // Vendors JS
+    // Main JS
+    script(src='../../asserts/userUI/assets/js/main.js')
+    // Page JS
+    script(src='../../asserts/js/profil.js')
+    // Place this tag in your head or just before your close body tag.
+    script(async='', defer='', src='https://buttons.github.io/buttons.js')
