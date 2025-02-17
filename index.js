@@ -5,7 +5,7 @@ let path = require("path");
 let fs = require("fs");
 
 // var document = require("./middlewire/document");
-const port = 3000; // yoki istalgan boshqa port
+const port = 1230; // yoki istalgan boshqa port
 const app = express();
 
 
