@@ -23,6 +23,7 @@ let bolimlar = {
 
 router.get("/", auth, async (req, res) => {
     let students  = await (await db).user.getUserAll();
+    students = students.find(student => student.idrole === 73828625);
     console.log("students :",students);
     let direction = ["Defektologiya (logopediya)", "Amaliy psixologiya", "Maktabgacha talim tashkilotining tarbiyachisi", "Pedagogik qayta tayorlov"]
     res.render('public/pages/student', {
