@@ -4,7 +4,6 @@ var auth = require("./middlewire/auth");
 let path = require("path");
 let fs = require("fs");
 
-// var document = require("./middlewire/document");
 const port = 1230; // yoki istalgan boshqa port
 const app = express();
 
@@ -22,9 +21,7 @@ const studentRouter = require("./routers/student");
 const RHTRouter = require("./routers/_____role_has_task");
 const DHTRouter = require("./routers/device_has_topic");
 
-// const certificateRouter = require("./routers/certificate");
-// const fileRouter = require("./routers/file");
-// const authRouter = require("./routers/auth");
+
 
 var db = require('./db/mongodb');
 
@@ -90,7 +87,6 @@ app.get('/', auth, async (req, res) => {
     task: true
   };
 
-  // // console.log(bolimlar,!bolimlar.task && !bolimlar.role && !bolimlar.user);
   const actions = {}//await (await db).action.getActionAll();
   // const static = await (await db).static.getStatic();
   let static = {};
@@ -109,10 +105,6 @@ app.get('/login', (req, res) => {
   res.render('public/pages/login'); // 'login.pug' faylini ishlatish
 });
 
-// app.get('/:page', (req, res) => {
-//   let page = req.params.page;
-//   res.sendFile(path.join(__dirname, 'public', `${page}.html`));
-// });
 
 // Serverni ishga tushirish
 app.listen(port, () => {

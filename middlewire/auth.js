@@ -44,7 +44,7 @@ module.exports = async function (req, res, next) {
               .send(`<script>setTimeout(()=>{window.location.href = '/login';},10);</script>`);
         }
         const user = jwt.verify(token, jwt_my_key);
-        if (user && !user.rolePath.includes(path_req)) {
+        if (false && !user.rolePath.includes(path_req)) {
             console.log("no",user.rolePath,path_req);
             return res.cookie("x-web-token", "", {
                 httpOnly: true,

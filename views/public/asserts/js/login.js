@@ -96,9 +96,6 @@ function startInterval() {
             code.classList.add("hidden");
             sendAndCheckBtn.innerText = "Qayta yuborish";
             clearInterval(interval); // Intervalni to'xtatish
-
-            // So'ngra yana yangi intervalni boshlash
-            // startInterval(); // Yangi intervalni boshlash
         }
     }, 1000);
 }
@@ -166,8 +163,10 @@ sendAndCheckBtn.addEventListener("click", () => {
                     resetInputs(); // Muvaffaqiyatli tasdiqdan keyin boshlang‘ich holatga qaytarish
                     if (data.nazoratchi) {
                         window.location = "/student";
+                    }else  window.location = "/profil";
+                    if (data.admin) {
+                        
                     }
-                    window.location = "/profil";
                 } else {
                     showAlertWithTimeout("Kod noto‘g‘ri yoki muddati o‘tgan.");
                     checkAttempts++;

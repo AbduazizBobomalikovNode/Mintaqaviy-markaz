@@ -101,14 +101,18 @@ Auth.post('/checked', async (req, res) => {
         user[0].exp = Math.floor(Date.now() / 1000) + 60 * 60;
         const token = jwt.sign({ ...user[0] }, jwt_my_key);
         let nazoratchi = false;
+        let admin = false;
         if (user[0].role && typeof user[0].role =="string" && user[0].role.includes("nazoratchi")) {
             nazoratchi = true;
+        }
+        if (user[0].role && typeof user[0].role =="string" && user[0].role.includes("admin")) {
+            admin = true;
         }
         console.log("jwt :", token)
         return res.cookie("x-web-token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-        }).status(200).json({ success: true,nazoratchi:nazoratchi, message: "Kod tasdiqlandi." });
+        }).status(200).json({ success: true,nazoratchi:nazoratchi,admin:admin, message: "Kod tasdiqlandi." });
     }
 
     res.status(400).json({ success: false, message: "Kod noto‘g‘ri yoki muddati tugagan." });
