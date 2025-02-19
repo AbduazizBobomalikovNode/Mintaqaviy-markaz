@@ -165,7 +165,7 @@ sendAndCheckBtn.addEventListener("click", () => {
                         window.location = "/student";
                     }else  window.location = "/profil";
                     if (data.admin) {
-                        
+                        window.location = "/profil";
                     }
                 } else {
                     showAlertWithTimeout("Kod noto‘g‘ri yoki muddati o‘tgan.");
