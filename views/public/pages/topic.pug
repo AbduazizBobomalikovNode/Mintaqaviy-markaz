@@ -1,5 +1,5 @@
 doctype html
-html(lang='en')
+html(lang='uz')
   head
     // Required meta tags
     meta(charset='utf-8')
@@ -23,21 +23,10 @@ html(lang='en')
     // endinject
     // Layout styles
     link(rel='stylesheet', href=path+'../assets/css/style.css')
+    link(rel='stylesheet', href=path+'../asserts/css/a11y.css')
     // End layout styles
     link(rel='shortcut icon', href=path+'../assets/images/favicon.png')
     
-    script.
-      window.onload = function () {
-      let title = document.title + " ✅";
-      let index = 0;
-      setInterval(function () {
-      index = (index + 1) % (title.length + 1);
-      if (index == 0) index = 1;
-      if (title.substring(index, title.length)[0] == ' ') index++;
-      document.title = title.substring(index, title.length) + title.substring(0, index);
-      //console.log(title.substring(index, title.length) + title.substring(0, index) + " " + index);
-      }, 400);
-      };
     
   body
     .container-scroller
@@ -53,7 +42,6 @@ html(lang='en')
               .profile-pic
                 .count-indicator
                   img.img-xs.rounded-circle(src=path+'../assets/images/faces/images.jpg', alt='')
-                  span.count.bg-success
                 .profile-name
                   h5.mb-0.font-weight-normal #{user.name}
                   span #{user.role}
@@ -101,11 +89,11 @@ html(lang='en')
             a.navbar-brand.brand-logo-mini(href='/')
               img(src=path+'../assets/images/logo-mini.svg', alt='logo')
           .navbar-menu-wrapper.flex-grow.d-flex.align-items-stretch
-            button.navbar-toggler.navbar-toggler.align-self-center(type='button', data-toggle='minimize')
+            button.navbar-toggler.navbar-toggler.align-self-center(type='button', data-toggle='minimize', aria-label="Yon menyuni yig'ish yoki ochish")
               span.mdi.mdi-menu
             ul.navbar-nav.navbar-nav-right
               li.nav-item.dropdown
-                a#profileDropdown.nav-link(href='#', data-toggle='dropdown')
+                a#profileDropdown.nav-link(href='#', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false', title='Profil menyusi')
                   .navbar-profile
                     img.img-xs.rounded-circle(src=path+'../assets/images/faces/images.jpg', alt='')
                     p.mb-0.d-none.d-sm-block.navbar-profile-name #{user.name}
@@ -128,7 +116,7 @@ html(lang='en')
                       p.preview-subject.mb-1 Hisobdan chiqish
                   .dropdown-divider
                   p.p-3.mb-0.text-center Hisob sozlamalari
-            button.navbar-toggler.navbar-toggler-right.d-lg-none.align-self-center(type='button', data-toggle='offcanvas')
+            button.navbar-toggler.navbar-toggler-right.d-lg-none.align-self-center(type='button', data-toggle='offcanvas', aria-label="Menyuni ochish")
               span.mdi.mdi-format-line-spacing
         // partial
         .main-panel
@@ -185,7 +173,7 @@ html(lang='en')
                             th
                               .form-check.form-check-muted.m-0
                                 label.form-check-label
-                                  input(onclick='chekboxAll()')#all.form-check-input(type='checkbox')
+                                  input(onclick='chekboxAll()', aria-label="Hammasini tanlash")#all.form-check-input(type='checkbox')
                             th  id 
                             th  mavzu nomi 
                             th  tarif
@@ -196,7 +184,7 @@ html(lang='en')
                                     td
                                         .form-check.form-check-muted.m-0
                                             label.form-check-label
-                                                input(id=topics[x].id,onclick='chekbox()').form-check-input(type='checkbox')
+                                                input(id=topics[x].id,onclick='chekbox()', aria-label="Qatorni tanlash").form-check-input(type='checkbox')
                                     td  #{topics[x].id}
                                     td  #{topics[x].name}
                                     td  #{topics[x].description}
@@ -204,17 +192,17 @@ html(lang='en')
                                         .btn-group(role='group', aria-label='Basic example')
                                         if view 
                                             a(href='/topic/view/'+topics[x].id)
-                                                button.btn.btn-outline-primary(type='button')
+                                                button.btn.btn-outline-primary(type='button' aria-label="Ko'rish")
                                                    i.mdi.mdi-eye
 
                                         if update 
                                             a(href='/topic/update/'+topics[x].id)
-                                                button.btn.btn-outline-light(type='button')
+                                                button.btn.btn-outline-light(type='button' aria-label="Tahrirlash")
                                                     i.mdi.mdi-lead-pencil
 
                                         if deletes 
                                                 a(href='/topic/delete/'+topics[x].id)
-                                                    button.btn.btn-outline-danger(type='button')
+                                                    button.btn.btn-outline-danger(type='button' aria-label="O'chirish")
                                                         i.mdi.mdi-close
                         tfoot 
                           tr 
@@ -223,10 +211,10 @@ html(lang='en')
                                 .btn-group(role='group' aria-label='Basic example')
                                   if page-1 != 0 
                                     a(href='/topic/page/'+(page-1))
-                                      button.btn.btn-outline-secondary(type='button') 
+                                      button.btn.btn-outline-secondary(type='button' aria-label="Oldingi sahifa")
                                         i.mdi.mdi-arrow-left-bold
                                   else 
-                                    button.btn.btn-outline-secondary.disabled(type='button') 
+                                    button.btn.btn-outline-secondary.disabled(type='button' aria-label="Oldingi sahifa")
                                       i.mdi.mdi-arrow-left-bold
                                   if  filter_count/15 < 15 
                                     - for (var x = 0; x < filter_count/15; x++)
@@ -252,10 +240,10 @@ html(lang='en')
                                   
                                   if page+1<=parseInt(filter_count/15)+(filter_count%15>0?1:0) 
                                     a(href='/topic/page/'+(page+1))
-                                      button.btn.btn-outline-secondary(type='button')   
+                                      button.btn.btn-outline-secondary(type='button' aria-label="Keyingi sahifa")
                                         i.mdi.mdi-arrow-right-bold
                                   else 
-                                    button.btn.btn-outline-secondary.disabled(type='button')   
+                                    button.btn.btn-outline-secondary.disabled(type='button' aria-label="Keyingi sahifa")
                                       i.mdi.mdi-arrow-right-bold
                             td(colspan=4)  #{filter_count} ta element mavjut
           // content-wrapper ends

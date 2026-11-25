@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" width="900" height="340" role="img" aria-labelledby="t d">
+  <title id="t">Mintaqaviy markaz: tizim qanday ishlaydi</title>
+  <desc id="d">Tinglovchi SMS kod orqali kiradi va profilida hujjatlarini yuklaydi. Xodim login va parol bilan kiradi va boshqaruv bo'limlarini ishlatadi. Express server JWT cookie'ni tekshiradi va ma'lumotni MongoDB'da, fayllarni uploads papkasida saqlaydi.</desc>
+  <style>
+    .card { fill: #ffffff; stroke: #d8dce6; stroke-width: 1.5; }
+    .srv { fill: #eef0ff; stroke: #6c63ff; stroke-width: 2; }
+    .db { fill: #eaf7ef; stroke: #2fa36b; stroke-width: 2; }
+    .h { font: 600 15px 'Segoe UI', Arial, sans-serif; fill: #2d3142; }
+    .s { font: 12.5px 'Segoe UI', Arial, sans-serif; fill: #6b7085; }
+    .m { font: 12px ui-monospace, Consolas, monospace; fill: #4b4f63; }
+    .wire { stroke: #cfd3e0; stroke-width: 2; fill: none; }
+    .flow { stroke: #6c63ff; stroke-width: 3; fill: none; stroke-dasharray: 7 11; animation: dash 1.3s linear infinite; }
+    .flow.g { stroke: #2fa36b; }
+    .dot { fill: #6c63ff; animation: blink 2.2s ease-in-out infinite; }
+    .d2 { animation-delay: .5s; } .d3 { animation-delay: 1s; }
+    @keyframes dash { to { stroke-dashoffset: -36; } }
+    @keyframes blink { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .flow, .dot { animation: none; } .dot { opacity: 1; } }
+  </style>
+  <rect width="900" height="340" rx="14" fill="#f7f8fc"/>
+
+  <!-- Users -->
+  <rect class="card" x="20" y="40" width="210" height="110" rx="12"/>
+  <text class="h" x="40" y="70">Tinglovchi</text>
+  <text class="m" x="40" y="94">GET /auth/sms/:phone</text>
+  <text class="m" x="40" y="114">POST /auth/checked</text>
+  <text class="s" x="40" y="136">SMS kod → profil, hujjatlar</text>
+
+  <rect class="card" x="20" y="190" width="210" height="110" rx="12"/>
+  <text class="h" x="40" y="220">Xodim (admin)</text>
+  <text class="m" x="40" y="244">POST /auth</text>
+  <text class="s" x="40" y="266">login + parol (bcrypt)</text>
+  <text class="s" x="40" y="286">rate limit: 10 / 15 daqiqa</text>
+
+  <path class="wire" d="M230 95 H300 V170 H330 M230 245 H300 V170"/>
+  <path class="flow" d="M300 170 H330"/>
+
+  <!-- Server -->
+  <rect class="srv" x="330" y="40" width="270" height="260" rx="14"/>
+  <text class="h" x="350" y="70">Express server</text>
+  <circle class="dot" cx="356" cy="98" r="5"/>
+  <text class="s" x="370" y="102">auth: JWT cookie (HS256)</text>
+  <circle class="dot d2" cx="356" cy="126" r="5"/>
+  <text class="s" x="370" y="130">staffOnly: talaba admin'ga kirmaydi</text>
+  <circle class="dot d3" cx="356" cy="154" r="5"/>
+  <text class="s" x="370" y="158">Joi validatsiya</text>
+  <text class="m" x="350" y="196">/user  /role  /task</text>
+  <text class="m" x="350" y="218">/student  /profil</text>
+  <text class="m" x="350" y="240">/download/:filename</text>
+  <text class="s" x="350" y="272">Pug sahifalar · views/public</text>
+
+  <path class="wire" d="M600 120 H680 M600 240 H680"/>
+  <path class="flow g" d="M600 120 H680"/>
+  <path class="flow g" d="M600 240 H680"/>
+
+  <!-- Storage -->
+  <rect class="db" x="680" y="60" width="200" height="110" rx="12"/>
+  <text class="h" x="700" y="90">MongoDB</text>
+  <text class="m" x="700" y="114">user · role · task</text>
+  <text class="m" x="700" y="134">topic · action</text>
+  <text class="s" x="700" y="156">URI_MONGO</text>
+
+  <rect class="db" x="680" y="190" width="200" height="110" rx="12"/>
+  <text class="h" x="700" y="220">uploads/</text>
+  <text class="s" x="700" y="244">avatar, pasport, diplom, ilova</text>
+  <text class="s" x="700" y="264">10 MB, jpg/png/pdf</text>
+  <text class="s" x="700" y="284">git'ga kirmaydi</text>
+</svg>

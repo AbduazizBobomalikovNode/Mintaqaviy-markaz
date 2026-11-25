@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
-const jwt_my_key = process.env.JWT_MY_KEY || "***REMOVED***";
+const { required } = require('../resurs/functions/env');
+const jwt_my_key = required('JWT_MY_KEY');
 var db = require('../db/mongodb');
 
-setInterval(async () => { db = await db }, 100);
 
 module.exports = async (req, res, next) => {
     // console.log(req.url);

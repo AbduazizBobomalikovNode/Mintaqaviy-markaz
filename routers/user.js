@@ -8,7 +8,14 @@ const validate = require("../resurs/validate/user");
 const action = require("../resurs/functions/action");
 var auth = require("../middlewire/auth");
 
-setTimeout(async () => { db = await db }, 100);
+
+// Parol xeshi hech qachon mijozga qaytarilmasligi kerak
+const publicUser = (u) => {
+    if (!u || typeof u !== 'object') return u;
+    const { password, ...rest } = u;
+    return rest;
+};
+const roleNames = (roles) => new Map(roles.map((r) => [r.id, r.name]));
 
 let bolimlar = {
     update: true,
@@ -23,13 +30,11 @@ let bolimlar = {
 };
 
 router.get("/", auth, async (req, res) => {
-    let user = await (await db).user.getUserAll();
+    const count = await (await db).user.getUserCount();
     let users = await (await db).user.getUserAllFilter(0, 15);
     let roles = await (await db).role.getRoleAll();
-    for (let index = 0; index < users.length; index++) {
-        const element = await (await db).role.getRole(Number(users[index].idrole));
-        users[index].role = element.name;
-    }
+    const names = roleNames(roles);
+    users = users.map((u) => ({ ...publicUser(u), role: names.get(Number(u.idrole)) }));
     
     // if (req.user.rolePath.includes("/certifcate")) {
     //     bolimlar.certifcate = true;
@@ -62,7 +67,7 @@ router.get("/", auth, async (req, res) => {
         path: '',
         roles: roles,
         users: users,
-        count: user.length,
+        count: count,
         page: 1,
         ...bolimlar,
         user: req.user
@@ -71,7 +76,6 @@ router.get("/", auth, async (req, res) => {
 router.get("/view/:id", auth, async (req, res) => {
     let id = Number(req.params.id);
     let user = await (await db).user.getUser(id);
-    user.idrole = (await (await db).role.getRole(user.idrole)).name + ` ( ${user.idrole} )`
     if (!user) {
         return res.render('public/pages/erors/error-404', {
             status: 404,
@@ -79,6 +83,9 @@ router.get("/view/:id", auth, async (req, res) => {
             path: '/user'
         });
     }
+    const userRole = await (await db).role.getRole(user.idrole);
+    user = publicUser(user);
+    user.idrole = (userRole ? userRole.name : '-') + ` ( ${user.idrole} )`
     // let bolimlar = {
     //     role: false,
     //     user: false,
@@ -116,16 +123,14 @@ router.get("/page/:page", auth, async (req, res) => {
     } else {
         page = parseInt(req.params.page);
     }
-    if (!page) {
+    if (!page || page < 1) {
         page = 1;
     }
-    let user = await (await db).user.getUserAll();
+    const total = await (await db).user.getUserCount();
     let users = await (await db).user.getUserAllFilter(page * 15 - 15, 15, role_filter);
     let roles = await (await db).role.getRoleAll();
-    for (let index = 0; index < users.length; index++) {
-        const element = await (await db).role.getRole(Number(users[index].idrole));
-        users[index].role = element.name;
-    }
+    const names = roleNames(roles);
+    users = users.map((u) => ({ ...publicUser(u), role: names.get(Number(u.idrole)) }));
     // let bolimlar = {
     //     update: false,
     //     deletes: false,
@@ -170,7 +175,7 @@ router.get("/page/:page", auth, async (req, res) => {
             roles: roles,
             users: users,
             count: users.length,
-            filter: user.length,
+            filter: total,
             page: page,
             select_role: role_filter,
             ...bolimlar,
@@ -181,8 +186,8 @@ router.get("/page/:page", auth, async (req, res) => {
             path: '../',
             roles: roles,
             users: users,
-            count: user.length,
-            filter: user.length,
+            count: total,
+            filter: total,
             page: page,
             select_role: '',
             ...bolimlar,
@@ -203,7 +208,7 @@ router.get("/get/user/:id", auth, async (req, res) => {
         return res.status(404).json({ error: 'ushbu idga mos foydalanuvchi to\'pilmadi!' });
     }
     res.json(
-        user
+        publicUser(user)
     );
 })
 // router.get("/get/profile",  async (req, res) => {
@@ -253,7 +258,7 @@ router.get("/get/role/:id", auth, async (req, res) => {
     }
     let users = await (await db).user.getUserRole(id);
     res.json(
-        users
+        users.map(publicUser)
     );
 })
 
@@ -275,7 +280,7 @@ router.get("/get/role/:id", auth, async (req, res) => {
 router.get('/get/all', auth, async (req, res) => {
     let users = await (await db).user.getUserAll();
     res.json(
-        users
+        users.map(publicUser)
     );
 })
 router.get('/add', auth, async (req, res) => {
@@ -316,6 +321,13 @@ router.post('/add', auth, async (req, res) => {
     }
     req.body.idrole = parseInt(req.body.idrole);
     let body = req.body;
+    if (!Number.isInteger(body.idrole)) {
+        return res.render('public/pages/erors/error-404', {
+            status: 400,
+            error: 'idrole butun son bo\'lishi shart',
+            path: '/user'
+        });
+    }
     const hashedPassword = await bcrypt.hash(body.password, 10);
     delete body.password;
     // console.log(body)
@@ -337,7 +349,7 @@ router.post('/add', auth, async (req, res) => {
     }
     body.password = hashedPassword;
     let user = {
-        id: generateId(),
+        id: await generateId(db, null, "user"),
         ...body
     };
     // console.log(body);
@@ -417,7 +429,7 @@ router.get('/update/:id', auth, async (req, res) => {
     // }
     res.render('public/pages/users/edit', {
         roles: roles,
-        users: user,
+        users: publicUser(user),
         ...bolimlar,
         user: req.user
     });
@@ -425,6 +437,9 @@ router.get('/update/:id', auth, async (req, res) => {
 
 
 router.post('/update/:id', auth, async (req, res) => {
+    if (req.body && req.body.password === '') {
+        delete req.body.password; // bo'sh parol maydoni = parol o'zgarmaydi
+    }
     const { error } = validate(req.body);
     if (error) {
         return res.render('public/pages/erors/error-404', {
@@ -476,8 +491,10 @@ router.post('/update/:id', auth, async (req, res) => {
         }
 
     }
+    if (body.hasOwnProperty("password")) {
+        body.password = await bcrypt.hash(body.password, 10);
+    }
     let result = await (await db).user.update(id, body);
-    // console.log(result);
     if (result.hasOwnProperty('error')) {
         return res.render('public/pages/erors/error-404', {
             status: 400,
@@ -556,6 +573,9 @@ router.put('/update/:id', auth, async (req, res) => {
     //         return res.status(404).json({ error: 'ushbu idga mos qurilma to\'pilmadi!' });
     //     }
     // }
+    if (body.hasOwnProperty("password")) {
+        body.password = await bcrypt.hash(body.password, 10);
+    }
     let result = await (await db).user.update(id, body);
     if (result.hasOwnProperty('error')) {
         return res.status(400).json(
@@ -563,7 +583,7 @@ router.put('/update/:id', auth, async (req, res) => {
         );
     }
     res.json(
-        result
+        publicUser(result)
     );
 })
 
@@ -659,7 +679,7 @@ router.delete('/delete/:id', auth, async (req, res) => {
     }
     let result = await (await db).user.delete(id);
     res.json(
-        user
+        publicUser(user)
     );
 })
 

@@ -1,5 +1,5 @@
 doctype html
-html(lang='en')
+html(lang='uz')
   head
     // Required meta tags
     meta(charset='utf-8')
@@ -19,19 +19,9 @@ html(lang='en')
     // endinject
     // Layout styles
     link(rel='stylesheet' href=path+'../assets/css/style.css')
+    link(rel='stylesheet' href=path+'../asserts/css/a11y.css')
     // End layout styles
     link(rel='shortcut icon' href=path+'../assets/images/favicon.png')
-    script.
-      window.onload = function () {
-      let title = document.title + " ✅";
-      let index = 0;
-      setInterval(function () {
-      index = (index + 1) % (title.length + 1);
-      if (index == 0) index = 1;
-      if (title.substring(index, title.length)[0] == ' ') index++;
-      document.title = title.substring(index, title.length) + title.substring(0, index);
-      }, 400);
-      };
     //
       <style>
       *{
@@ -53,7 +43,6 @@ html(lang='en')
               .profile-pic
                 .count-indicator
                   img.img-xs.rounded-circle(src=path+'../assets/images/faces/images.jpg' alt='')
-                  span.count.bg-success
                 .profile-name
                   h5.mb-0.font-weight-normal #{user.name}
                   span #{user.role}
@@ -178,7 +167,7 @@ html(lang='en')
                             th
                               .form-check.form-check-muted.m-0
                                 label.form-check-label
-                                  input(onclick='chekboxAll()')#all.form-check-input(type='checkbox')
+                                  input(onclick='chekboxAll()', aria-label="Hammasini tanlash")#all.form-check-input(type='checkbox')
                             th &numero;
                             th Rol nomi
                             th Rol Vazifalari
@@ -189,7 +178,7 @@ html(lang='en')
                               td
                                 .form-check.form-check-muted.m-0
                                   label.form-check-label
-                                    input(id=roles[x].id,onclick='chekbox()').form-check-input(type='checkbox')
+                                    input(id=roles[x].id,onclick='chekbox()', aria-label="Qatorni tanlash").form-check-input(type='checkbox')
                               td #{page*15-15+x+1} 
                               td #{roles[x].name}
                               td #{roles[x].tasks}
@@ -197,15 +186,15 @@ html(lang='en')
                                 .btn-group(role='group' aria-label='Basic example')
                                   if  view 
                                     a(href='/role/view/'+roles[x].id)
-                                      button.btn.btn-outline-primary(type='button')
+                                      button.btn.btn-outline-primary(type='button' aria-label="Ko'rish")
                                         i.mdi.mdi-eye
                                   if update
                                     a(href='/role/update/'+roles[x].id)
-                                      button.btn.btn-outline-light(type='button' title='tahrirlash')
+                                      button.btn.btn-outline-light(type='button' title='tahrirlash' aria-label="Tahrirlash")
                                         i.mdi.mdi-lead-pencil
                                   if deletes
                                     a(href='/role/delete/'+roles[x].id)
-                                      button.btn.btn-outline-danger(type='button')
+                                      button.btn.btn-outline-danger(type='button' aria-label="O'chirish")
                                         i.mdi.mdi-close
                         tfoot 
                           tr 
@@ -214,10 +203,10 @@ html(lang='en')
                                 .btn-group(role='group' aria-label='Basic example')
                                   if page-1 != 0 
                                     a(href='/role/page/'+(page-1))
-                                      button.btn.btn-outline-secondary(type='button') 
+                                      button.btn.btn-outline-secondary(type='button' aria-label="Oldingi sahifa")
                                         i.mdi.mdi-arrow-left-bold
                                   else 
-                                    button.btn.btn-outline-secondary.disabled(type='button') 
+                                    button.btn.btn-outline-secondary.disabled(type='button' aria-label="Oldingi sahifa")
                                       i.mdi.mdi-arrow-left-bold
                                   - for (var x = 0; x < count/15; x++)
                                     if page-1==x
@@ -227,10 +216,10 @@ html(lang='en')
                                         button.btn.btn-outline-secondary(type='button') #{x+1}
                                   if page+1<=parseInt(count/15)+(count%15>0?1:0) 
                                     a(href='/role/page/'+(page+1))
-                                      button.btn.btn-outline-secondary(type='button')   
+                                      button.btn.btn-outline-secondary(type='button' aria-label="Keyingi sahifa")
                                         i.mdi.mdi-arrow-right-bold
                                   else 
-                                    button.btn.btn-outline-secondary.disabled(type='button')   
+                                    button.btn.btn-outline-secondary.disabled(type='button' aria-label="Keyingi sahifa")
                                       i.mdi.mdi-arrow-right-bold
                             td #{count} ta element mavjut
           // content-wrapper ends

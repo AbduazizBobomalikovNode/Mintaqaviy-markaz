@@ -1,0 +1,27 @@
+# Bog'liqliklar
+node_modules/
+views/public/node_modules/
+
+# Maxfiy sozlamalar
+.env
+.env.*
+!.env.example
+
+# Yuklangan fayllar (shaxsiy ma'lumotlar)
+uploads/*
+!uploads/.gitkeep
+
+# Loglar
+logs/
+*.log
+npm-debug.log*
+
+# OS / muharrir fayllari
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

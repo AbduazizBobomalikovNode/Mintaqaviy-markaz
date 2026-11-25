@@ -29,7 +29,7 @@ const publishButton = document.getElementById('publishButton');
 const subscribeButton = document.getElementById('subscribeButton');
 const messagesRoot = document.getElementById('messages');
 
-const token = getCookie('token') || "adsafdsgsdgf45sdfsefs"; // Assuming a cookie named 'token'
+const token = getCookie('token'); // Assuming a cookie named 'token'
 if (token) {
     //const wsUrl = `mqtt://localhost:7000`;
     client = mqtt.connect(wsUrl, {

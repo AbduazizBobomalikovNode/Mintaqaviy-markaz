@@ -1,5 +1,5 @@
 doctype html
-html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-default', data-assets-path='../../assets/', data-template='vertical-menu-template-free')
+html.light-style.layout-menu-fixed(lang='uz', dir='ltr', data-theme='theme-default', data-assets-path='../../assets/', data-template='vertical-menu-template-free')
   head
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0')
@@ -17,6 +17,7 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
     link.template-customizer-core-css(rel='stylesheet', href='../../asserts/userUI/assets/vendor/css/core.css')
     link.template-customizer-theme-css(rel='stylesheet', href='../../asserts/userUI/assets/vendor/css/theme-default.css')
     link(rel='stylesheet', href='../../asserts/userUI/assets/css/demo.css')
+    link(rel='stylesheet', href='../../asserts/css/a11y.css')
     // Vendors CSS
     link(rel='stylesheet', href='../../asserts/userUI/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')
     // Page CSS
@@ -60,18 +61,17 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
                 // User
                 li.nav-item.navbar-dropdown.dropdown-user.dropdown
                   a.nav-link.dropdown-toggle.hide-arrow(href='javascript:void(0);', data-bs-toggle='dropdown')
-                    .avatar.avatar-online
+                    .avatar
                       img.w-px-40.h-auto.rounded-circle(src=user.avatar?user.avatar:'../../asserts/userUI/assets/img/avatars/1.png', alt='')
                   ul.dropdown-menu.dropdown-menu-end
                     li
                       a.dropdown-item(href='#')
                         .d-flex
                           .flex-shrink-0.me-3
-                            .avatar.avatar-online
+                            .avatar
                               img.w-px-40.h-auto.rounded-circle(src=user.avatar?user.avatar:'../../asserts/userUI/assets/img/avatars/1.png', alt='')
                           .flex-grow-1
-                            span.fw-semibold.d-block Bobomalikov
-                            small.text-muted Abduaziz
+                            span.fw-semibold.d-block #{user ? (user.firstName || user.name || '') : ''}
                     li
                       .dropdown-divider
                     li
@@ -183,7 +183,10 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
                                         i.bx.bxs-download
                                     | Diplomingizni ilovasini pdf ko&apos;rinishda yuklab olishingiz mumkin
                             if user.firstName || user.lastName || user.direction || user.passport || user.diplom || user.ilova
-                                p.text-danger.text-center  Ma'lumotlaringizni  xato kirgizgan bo'lsangiz, ushbu raqamga telefon qiling: +998916664315
+                                if supportPhone
+                                    p.text-danger.text-center  Ma'lumotlaringizni  xato kirgizgan bo'lsangiz, ushbu raqamga telefon qiling: #{supportPhone}
+                                else
+                                    p.text-danger.text-center  Ma'lumotlaringizni  xato kirgizgan bo'lsangiz, markazga murojaat qiling.
                         .mt-2
                             if !user.firstName || !user.lastName || !user.direction || !user.passport || !user.diplom || !user.ilova
                                 button#save.btn.btn-primary.me-2(type='submit') Saqlash
@@ -223,4 +226,3 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
     // Page JS
     script(src='../../asserts/js/profil.js')
     // Place this tag in your head or just before your close body tag.
-    script(async='', defer='', src='https://buttons.github.io/buttons.js')

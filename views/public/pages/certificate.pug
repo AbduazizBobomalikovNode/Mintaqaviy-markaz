@@ -1,5 +1,5 @@
 doctype html
-html(lang='en')
+html(lang='uz')
   head
     // Required meta tags
     meta(charset='utf-8')
@@ -19,19 +19,9 @@ html(lang='en')
     // endinject
     // Layout styles
     link(rel='stylesheet' href=path+'../assets/css/style.css')
+    link(rel='stylesheet' href=path+'../asserts/css/a11y.css')
     // End layout styles
     link(rel='shortcut icon' href=path+'../assets/images/favicon.png')
-    script.
-      window.onload = function () {
-      let title = document.title + " ✅";
-      let index = 0;
-      setInterval(function () {
-      index = (index + 1) % (title.length + 1);
-      if (index == 0) index = 1;
-      if (title.substring(index, title.length)[0] == ' ') index++;
-      document.title = title.substring(index, title.length) + title.substring(0, index);
-      }, 400);
-      };
     //
       <style>
       *{
@@ -53,7 +43,6 @@ html(lang='en')
               .profile-pic
                 .count-indicator
                   img.img-xs.rounded-circle(src=path+'../assets/images/faces/images.jpg' alt='')
-                  span.count.bg-success
                 .profile-name
                   h5.mb-0.font-weight-normal #{user.name}
                   span #{user.role}
@@ -213,7 +202,7 @@ html(lang='en')
                             th
                               .form-check.form-check-muted.m-0
                                 label.form-check-label
-                                  input(onclick='chekboxAll()')#all.form-check-input(type='checkbox')
+                                  input(onclick='chekboxAll()', aria-label="Hammasini tanlash")#all.form-check-input(type='checkbox')
                             th  № 
                             th  Hujjat raqami
                             th  Hujjat turi
@@ -231,7 +220,7 @@ html(lang='en')
                               td
                                 .form-check.form-check-muted.m-0
                                   label.form-check-label
-                                    input(id=docs[x].id,onclick='chekbox()').form-check-input(type='checkbox')
+                                    input(id=docs[x].id,onclick='chekbox()', aria-label="Qatorni tanlash").form-check-input(type='checkbox')
                               td  #{docs[x].son}
                               td  #{docs[x].id}
                               td  #{doc_name[docs[x].type]}
@@ -256,23 +245,23 @@ html(lang='en')
                                 .btn-group(role='group' aria-label='Basic example')
                                   if view 
                                     a(href = docs[x].link)
-                                      button.btn.btn-outline-primary(type='button')
+                                      button.btn.btn-outline-primary(type='button' aria-label="Ko'rish")
                                         i.mdi.mdi-eye
                                   if update && docs[x].status && activeDocumentUpdate 
                                     a(href='/certifcate/update/'+docs[x].id)
-                                      button.btn.btn-outline-light(type='button' title='tahrirlash')
+                                      button.btn.btn-outline-light(type='button' title='tahrirlash' aria-label="Tahrirlash")
                                         i.mdi.mdi-lead-pencil
                                   else if update && !docs[x].status
                                     a(href='/certifcate/update/'+docs[x].id)
-                                      button.btn.btn-outline-light(type='button' title='tahrirlash')
+                                      button.btn.btn-outline-light(type='button' title='tahrirlash' aria-label="Tahrirlash")
                                         i.mdi.mdi-lead-pencil
                                   if deletes && docs[x].status &&  activeDocumentDelete
                                       a(href='/certifcate/delete/'+docs[x].id)
-                                        button.btn.btn-outline-danger(type='button')
+                                        button.btn.btn-outline-danger(type='button' aria-label="O'chirish")
                                           i.mdi.mdi-close
                                   else if deletes && !docs[x].status
                                     a(href='/certifcate/delete/'+docs[x].id)
-                                      button.btn.btn-outline-danger(type='button')
+                                      button.btn.btn-outline-danger(type='button' aria-label="O'chirish")
                                         i.mdi.mdi-close
                         tfoot 
                           tr 
@@ -281,10 +270,10 @@ html(lang='en')
                                 .btn-group(role='group' aria-label='Basic example')
                                   if page-1 != 0 
                                     a(href='/certifcate/page/'+(page-1))
-                                      button.btn.btn-outline-secondary(type='button') 
+                                      button.btn.btn-outline-secondary(type='button' aria-label="Oldingi sahifa")
                                         i.mdi.mdi-arrow-left-bold
                                   else 
-                                    button.btn.btn-outline-secondary.disabled(type='button') 
+                                    button.btn.btn-outline-secondary.disabled(type='button' aria-label="Oldingi sahifa")
                                       i.mdi.mdi-arrow-left-bold
                                   - for (var x = 0; x < filter_count/15; x++)
                                     if page-1==x
@@ -294,10 +283,10 @@ html(lang='en')
                                         button.btn.btn-outline-secondary(type='button') #{x+1}
                                   if page+1<=parseInt(filter_count/15)+(filter_count%15>0?1:0) 
                                     a(href='/certifcate/page/'+(page+1))
-                                      button.btn.btn-outline-secondary(type='button')   
+                                      button.btn.btn-outline-secondary(type='button' aria-label="Keyingi sahifa")
                                         i.mdi.mdi-arrow-right-bold
                                   else 
-                                    button.btn.btn-outline-secondary.disabled(type='button')   
+                                    button.btn.btn-outline-secondary.disabled(type='button' aria-label="Keyingi sahifa")
                                       i.mdi.mdi-arrow-right-bold
                             td(colspan=4)  #{filter_count} ta element mavjut
           // content-wrapper ends

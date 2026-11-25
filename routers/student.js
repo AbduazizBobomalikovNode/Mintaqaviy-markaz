@@ -3,9 +3,9 @@ const router = express.Router();
 
 var db = require('../db/mongodb');
 var auth = require("../middlewire/auth");
+const { STUDENT_ROLE_ID } = auth;
 
 
-setTimeout(async () => { db = await db }, 100);
 
 let bolimlar = {
     update: true,
@@ -20,13 +20,13 @@ let bolimlar = {
 };
 
 router.get("/", auth, async (req, res) => {
-    let students  = await (await db).user.getUserAll();
-    students = students.filter(student => student.idrole == 73828625);
-    console.log("students :",students);
+    // Filtr bazada bajariladi; parol xeshi sahifaga uzatilmaydi
+    let students = (await (await db).user.getUserRole(STUDENT_ROLE_ID)).map(({ password, ...rest }) => rest);
     let direction = ["Defektologiya (logopediya)", "Amaliy psixologiya", "Maktabgacha talim tashkilotining tarbiyachisi", "Pedagogik qayta tayorlov"]
     res.render('public/pages/student', {
         direction: direction,
         students:students,
+        user: req.user,
     });
 })
 

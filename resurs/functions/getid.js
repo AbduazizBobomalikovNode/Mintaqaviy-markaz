@@ -4,7 +4,6 @@ const { hash,genSalt } = require('bcrypt');
 // setTimeout(async () => { db = await db }, 100);
 
 function createUniqueRandomGenerator(num) {
-    console.log(num)
     if (num) {
         let binaryInteger = parseInt(parseInt(Math.random() * 10) * 10 ** 12 + (parseInt((parseInt(Math.random() * 10 ** 12) + "").split('').reverse().join('')) + (new Date()).valueOf()));
         if (`${binaryInteger}`.length > 13) {
@@ -45,7 +44,6 @@ async function Chek(db,num,table,param,solt){
         gen_id = createUniqueRandomGenerator(8);
     }
     let res = await (await db).chek_id(table,gen_id)
-    console.log(table,gen_id,res)
     if(!res){
         return gen_id;
     }else{

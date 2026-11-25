@@ -22,6 +22,9 @@ function User(table) {
             .sort({ name: 1 }).limit(limit).skip(skip).toArray();
         return result;
     };
+    this.getUserCount = async (filter = {}) => {
+        return table.countDocuments(filter);
+    };
     this.getUserForObj = async (obj) => {
         const result = await table.find(obj, {
             projection: { _id: 0, lastModified: 0 }

@@ -1,9 +1,9 @@
 doctype html
-html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-default', data-assets-path='../asserts/userUI/assets/', data-template='vertical-menu-template-free')
+html.light-style.layout-menu-fixed(lang='uz', dir='ltr', data-theme='theme-default', data-assets-path='../asserts/userUI/assets/', data-template='vertical-menu-template-free')
   head
     meta(charset='utf-8')
     meta(name='viewport', content='width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0')
-    title Account settings - Account | Sneat - Bootstrap 5 HTML Admin Template - Pro
+    title Tinglovchilar | Samdu mintaqaviy markaz
     meta(name='description', content='')
     // Favicon
     link(rel='icon', type='image/x-icon', href='../asserts/userUI/assets/img/favicon/favicon.ico')
@@ -17,6 +17,7 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
     link.template-customizer-core-css(rel='stylesheet', href='../asserts/userUI/assets/vendor/css/core.css')
     link.template-customizer-theme-css(rel='stylesheet', href='../asserts/userUI/assets/vendor/css/theme-default.css')
     link(rel='stylesheet', href='../asserts/userUI/assets/css/demo.css')
+    link(rel='stylesheet', href='../asserts/css/a11y.css')
     // Vendors CSS
     link(rel='stylesheet', href='../asserts/userUI/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')
     // Page CSS
@@ -60,18 +61,17 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
                 // User
                 li.nav-item.navbar-dropdown.dropdown-user.dropdown
                   a.nav-link.dropdown-toggle.hide-arrow(href='javascript:void(0);', data-bs-toggle='dropdown')
-                    .avatar.avatar-online
+                    .avatar
                       img.w-px-40.h-auto.rounded-circle(src='../asserts/userUI/assets/img/avatars/1.png', alt='')
                   ul.dropdown-menu.dropdown-menu-end
                     li
                       a.dropdown-item(href='#')
                         .d-flex
                           .flex-shrink-0.me-3
-                            .avatar.avatar-online
+                            .avatar
                               img.w-px-40.h-auto.rounded-circle(src='../asserts/userUI/assets/img/avatars/1.png', alt='')
                           .flex-grow-1
-                            span.fw-semibold.d-block Bobomalikov
-                            small.text-muted Abduaziz
+                            span.fw-semibold.d-block #{user ? user.name : ''}
                     li
                       .dropdown-divider
                     li
@@ -109,7 +109,6 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
                         th Diplom ilovasi
                         th amallar
                     tbody.table-border-bottom-0
-                      //- - var students = [{firstName:"bobomalikov",lastName:"bobomalikov",phone:"+998916664315"}];
                       - for (var x = 0; x < students.length; x++)
                         - var xabar = direction[Number(students[x].direction)-1] || "bo'sh"; 
                         tr
@@ -121,17 +120,17 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
                           td #{students[x].phone}
                           td #{xabar.length > 15 ? xabar.slice(0, 15) + "..." : xabar}
                           td
-                            button.btn.btn-info.me-1(type='submit' onclick=`downloadFile('/download/${students[x].passport}')`)
+                            button.btn.btn-info.me-1(type='button' aria-label='Pasportni yuklab olish' title='Pasportni yuklab olish' disabled=!students[x].passport data-file=students[x].passport onclick="downloadFile('/download/' + encodeURIComponent(this.dataset.file))")
                               i.bx.bxs-download
                           td
-                            button.btn.btn-warning.me-1(type='submit' onclick=`downloadFile('/download/${students[x].diplom}')`)
+                            button.btn.btn-warning.me-1(type='button' aria-label='Diplomni yuklab olish' title='Diplomni yuklab olish' disabled=!students[x].diplom data-file=students[x].diplom onclick="downloadFile('/download/' + encodeURIComponent(this.dataset.file))")
                               i.bx.bxs-download
                           td
-                            button.btn.btn-secondary.me-1(type='submit' onclick=`downloadFile('/download/${students[x].ilova}')`)
+                            button.btn.btn-secondary.me-1(type='button' aria-label='Diplom ilovasini yuklab olish' title='Diplom ilovasini yuklab olish' disabled=!students[x].ilova data-file=students[x].ilova onclick="downloadFile('/download/' + encodeURIComponent(this.dataset.file))")
                               i.bx.bxs-download
                           td
                             .dropdown
-                              button.btn.p-0.dropdown-toggle.hide-arrow(type='button', data-bs-toggle='dropdown')
+                              button.btn.p-0.dropdown-toggle.hide-arrow(type='button', data-bs-toggle='dropdown', aria-label="Amallar menyusi", title="Amallar menyusi")
                                 i.bx.bx-dots-vertical-rounded
                               .dropdown-menu
                                 a.dropdown-item(href='javascript:void(0);')
@@ -148,7 +147,7 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
                   | &copy;
                   script.
                     document.write(new Date().getFullYear());
-                                  , made with Abdusoft
+                  |  , made with Abdusoft
                 div
                   // <a href="https://themeselection.com/license/" class="footer-link me-4" target="_blank">License</a>
                   a.footer-link.me-4(href='#', target='_blank') More Themes
@@ -175,5 +174,4 @@ html.light-style.layout-menu-fixed(lang='en', dir='ltr', data-theme='theme-defau
     // Page JS
     script(src='../asserts/userUI/assets/js/pages-account-settings-account.js')
     // Place this tag in your head or just before your close body tag.
-    script(async='', defer='', src='https://buttons.github.io/buttons.js')
     script(src='../asserts/js/student.js')

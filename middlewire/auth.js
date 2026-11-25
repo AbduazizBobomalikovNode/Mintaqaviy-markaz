@@ -1,70 +1,47 @@
 const jwt = require('jsonwebtoken');
-const jwt_my_key = process.env.JWT_MY_KEY || "***REMOVED***";
+const { required } = require('../resurs/functions/env');
+const jwt_my_key = required('JWT_MY_KEY');
 
-// let x = {
-//     'user': ['get/user','get/device','get/role','get/all', 'add', 'uptade', 'delete'],
-//     'role': ['get/role', 'get/all', 'add', 'uptade', 'delete'],
-//     'task': ['get/task', 'get/user', 'get/device', 'get/all', 'add', 'uptade', 'delete'],
-//     'device': ['get/device','get/all', 'add', 'uptade', 'delete'],
-//     'history': ['get/history','get/device', 'get/all', 'add', 'uptade', 'delete']
-// }
-// let user = {
-//     'task': ['get/task', 'get/user', 'get/device', 'get/all', 'add', 'uptade', 'delete']
-// }
+const isDev = process.env.NODE_ENV !== 'production';
+const STUDENT_ROLE_ID = 73828625; // SMS orqali ro'yxatdan o'tgan talabalar roli
 
+const redirectToLogin = (delay = 10) =>
+    `<script>setTimeout(()=>{window.location.href = '/login';},${delay});</script>`;
 
-module.exports = async function (req, res, next) {
-    req.user = {
-        id:55087719,
-        role : "demo",
-        name : "demo",
-    };
-    // return next();
-    const x_token = req.cookies['x-web-token'];
-    if (!x_token) {
-        console.log('cookies  ishlamadi');
-        return res.send(`<script>setTimeout(()=>{window.location.href = '/login';},10);</script>`);
+function clearCookie(res) {
+    return res.cookie("x-web-token", "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+    });
+}
+
+// Tokenni tekshiradi (imzo va muddat jwt.verify tomonidan tekshiriladi).
+async function auth(req, res, next) {
+    const token = req.cookies && req.cookies['x-web-token'];
+    if (!token || typeof token !== 'string') {
+        return res.send(redirectToLogin());
     }
-    // console.log('cookies  ishladi:', x_token);
-    let path_req = req.originalUrl.slice(0,req.originalUrl.lastIndexOf("/"));
-    
-    console.log(path_req);
-    // return next();
-    const token = req.cookies['x-web-token'];
     try {
-        const expiredAt = jwt.decode(token).exp;
-        const now = Math.floor(Date.now() / 1000);
-        if (expiredAt < now) {
-            console.log('Token yaroqsiz');
-            return res.cookie("x-web-token", "", {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-              })
-              .status(200)
-              .send(`<script>setTimeout(()=>{window.location.href = '/login';},10);</script>`);
-        }
-        const user = jwt.verify(token, jwt_my_key);
-        if (false && !user.rolePath.includes(path_req)) {
-            console.log("no",user.rolePath,path_req);
-            return res.cookie("x-web-token", "", {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-              })
-              .status(200)
-              .send(`<script>setTimeout(()=>{window.location.href = '/login';},10);</script>`);
-        }
-        req.user = user;
+        req.user = jwt.verify(token, jwt_my_key, { algorithms: ['HS256'] });
         return next();
     } catch (err) {
-        console.log(err);
-        return res.send(`<script>setTimeout(()=>{window.location.href = '/login';},1);</script>`);
+        if (err && err.name === 'TokenExpiredError') {
+            return clearCookie(res).status(200).send(redirectToLogin());
+        }
+        if (isDev) console.log('Token yaroqsiz:', err.message);
+        return res.send(redirectToLogin(1));
     }
 }
 
-// const { message } = err;
-// if (message == "jwt must be provided") {
-//     return res.status(400).json({ error: "web token jonatilmagan!" })
-// } else {
-//     console.log(err);
-//     return res.status(401).json({ error: "ushbu foydalanuvchi autorizatsiya qilmagan!" })
-// }
+// Faqat xodimlar (talaba roli bo'lmaganlar) uchun. auth dan keyin ishlatiladi.
+function staffOnly(req, res, next) {
+    if (req.user && Number(req.user.idrole) === STUDENT_ROLE_ID) {
+        return res.status(403).send("Ushbu bo'limga kirish uchun ruxsat yo'q!");
+    }
+    return next();
+}
+
+module.exports = auth;
+module.exports.staffOnly = staffOnly;
+module.exports.STUDENT_ROLE_ID = STUDENT_ROLE_ID;

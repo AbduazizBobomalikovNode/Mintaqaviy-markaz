@@ -5,7 +5,6 @@ var generateId = require("../resurs/functions/getid");
 const validate = require("../resurs/validate/task");
 var auth = require("../middlewire/auth");
 
-setTimeout(async () => { db = await db }, 100);
 
 
 let bolimlar = {

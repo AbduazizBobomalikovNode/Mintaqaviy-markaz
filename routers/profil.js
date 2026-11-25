@@ -7,9 +7,12 @@ var db = require('../db/mongodb');
 var generateId = require('../resurs/functions/getid');
 const validate = require("../resurs/validate/device");
 var auth = require("../middlewire/auth");
+const resolveInside = require("../resurs/functions/safePath");
+
+const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+const DIRECTIONS = ["Defektologiya (logopediya)", "Amaliy psixologiya", "Maktabgacha talim tashkilotining tarbiyachisi", "Pedagogik qayta tayorlov"];
 
 
-setTimeout(async () => { db = await db }, 100);
 
 
 const router = express.Router();
@@ -17,15 +20,18 @@ const router = express.Router();
 // Fayllarni saqlash uchun multer konfiguratsiyasi
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "./uploads"); // Fayllar saqlanadigan katalog
+        cb(null, UPLOADS_DIR); // Fayllar saqlanadigan katalog
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`); // Fayl nomi vaqt tamg‘asi bilan
+        // Fayl nomidagi yo'l va maxsus belgilar olib tashlanadi
+        const safe = path.basename(file.originalname).replace(/[^\p{L}\p{N}._ ,()-]/gu, "_").slice(0, 120);
+        cb(null, `${Date.now()}-${safe}`); // Fayl nomi vaqt tamg‘asi bilan
     },
 });
 
 const upload = multer({
     storage,
+    limits: { fileSize: 10 * 1024 * 1024, files: 4 }, // 10 MB
     fileFilter: (req, file, cb) => {
         // Faqat ruxsat etilgan fayl formatlarini qabul qilish
         const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
@@ -48,31 +54,31 @@ router.get('/', auth, async (req, res) => {
     // };
 
     // // console.log(bolimlar,!bolimlar.task && !bolimlar.role && !bolimlar.user);
-    const actions = {}//await (await db).action.getActionAll();
-    // const static = await (await db).static.getStatic();
-    let static = {};
-
     let user = await (await db).user.getUser(req.user.id);
-    let avatarPath = user.avatar ? path.join(__dirname,"../", 'uploads', user.avatar) : null;
-    console.log(user);
-    // Agar avatar mavjud bo'lsa
+    if (!user) {
+        return res.status(404).json({ message: "Foydalanuvchi topilmadi" });
+    }
+    delete user.password;
+    // Avatar fayli uploads papkasidan o'qiladi (yo'l tekshiriladi)
+    const avatarPath = user.avatar ? resolveInside(UPLOADS_DIR, user.avatar) : null;
+    user.avatar = null;
     if (avatarPath) {
-        // Faylni o'qish va Base64 formatiga o'zgartirish
-        const avatarBase64 = fs.readFileSync(avatarPath, { encoding: 'base64' });
-        // console.log(`data:image/jpeg;base64,${avatarBase64}`);
-        user.avatar = `data:image/jpeg;base64,${avatarBase64}`;;
-    } else {
-        user.avatar = null;
+        try {
+            const avatarBase64 = await fs.promises.readFile(avatarPath, { encoding: 'base64' });
+            user.avatar = `data:image/jpeg;base64,${avatarBase64}`;
+        } catch (e) {
+            user.avatar = null;
+        }
     }
     if (user.direction) {
-        let direction = ["Defektologiya (logopediya)","Amaliy psixologiya","Maktabgacha talim tashkilotining tarbiyachisi","Pedagogik qayta tayorlov"]
-        user.direction = direction[Number(user.direction) - 1];
+        user.direction = DIRECTIONS[Number(user.direction) - 1];
     }
 
     res.render('public/pages/utils/profil', {
         // static:static,
         // ...bolimlar,
         user: user,
+        supportPhone: process.env.SUPPORT_PHONE || '',
         // actions:actions
     }); // 'login.pug' faylini ishlatish
 });
@@ -90,77 +96,38 @@ router.post(
         try {
             const { firstName, lastName, direction } = req.body; // Matnli maydonlar
 
-            const avatar = req.files.avatar ? req.files.avatar[0] : null; // Avatar fayli
-            const passport = req.files.passport ? req.files.passport[0] : null; // Pasport fayli
-            const diplom = req.files.diplom ? req.files.diplom[0] : null; // Diplom fayli
-            const ilova = req.files.ilova ? req.files.ilova[0] : null; // Ilova fayli
+            const avatar = req.files && req.files.avatar ? req.files.avatar[0] : null; // Avatar fayli
+            const passport = req.files && req.files.passport ? req.files.passport[0] : null; // Pasport fayli
+            const diplom = req.files && req.files.diplom ? req.files.diplom[0] : null; // Diplom fayli
+            const ilova = req.files && req.files.ilova ? req.files.ilova[0] : null; // Ilova fayli
 
+            const str = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
             let user = {};
-            if (firstName) {
-                user.firstName = firstName;
+            if (str(firstName, 100)) {
+                user.firstName = str(firstName, 100);
             }
-            if (lastName) {
-                user.lastName = lastName;
+            if (str(lastName, 100)) {
+                user.lastName = str(lastName, 100);
             }
-            if (direction) {
-                user.direction = direction;
+            if (str(direction, 2)) {
+                user.direction = str(direction, 2);
             }
-            if (avatar) {
-                if (req.user.avatar) {
-                    // Oldingi avatar faylini o'chirish
-                    const oldAvatarPath = path.join(__dirname, 'uploads', req.user.avatar);
-
-                    // Fayl mavjudligini tekshirib, uni o'chirish
-                    if (fs.existsSync(oldAvatarPath)) {
-                        fs.unlinkSync(oldAvatarPath);  // Faylni o'chirish
+            // Eski fayllar DB dagi yozuvdan olinadi (JWT dan emas) va uploads ichidan o'chiriladi
+            const current = (await (await db).user.getUser(req.user.id)) || {};
+            const replaceFile = (field, uploaded) => {
+                if (!uploaded) return;
+                if (current[field]) {
+                    const old = resolveInside(UPLOADS_DIR, current[field]);
+                    if (old && fs.existsSync(old)) {
+                        fs.unlinkSync(old);
                     }
                 }
-                user.avatar = avatar.filename;  // Yangi avatarni qo'shish
-            }
-            if (passport) {
-                if (req.user.passport) {
-                    // Oldingi avatar faylini o'chirish
-                    const oldAvatarPath = path.join(__dirname, 'uploads', req.user.passport);
-
-                    // Fayl mavjudligini tekshirib, uni o'chirish
-                    if (fs.existsSync(oldAvatarPath)) {
-                        fs.unlinkSync(oldAvatarPath);  // Faylni o'chirish
-                    }
-                }
-                user.passport = passport.filename;
-            }
-            if (diplom) {
-                if (req.user.diplom) {
-                    // Oldingi avatar faylini o'chirish
-                    const oldAvatarPath = path.join(__dirname, 'uploads', req.user.diplom);
-
-                    // Fayl mavjudligini tekshirib, uni o'chirish
-                    if (fs.existsSync(oldAvatarPath)) {
-                        fs.unlinkSync(oldAvatarPath);  // Faylni o'chirish
-                    }
-                }
-                user.diplom = diplom.filename;
-            }
-            if (ilova) {
-                if (req.user.ilova) {
-                    // Oldingi avatar faylini o'chirish
-                    const oldAvatarPath = path.join(__dirname, 'uploads', req.user.ilova);
-
-                    // Fayl mavjudligini tekshirib, uni o'chirish
-                    if (fs.existsSync(oldAvatarPath)) {
-                        fs.unlinkSync(oldAvatarPath);  // Faylni o'chirish
-                    }
-                }
-                user.ilova = ilova.filename;
-            }
-            // Yuklangan fayllar va matnli ma'lumotlarni ko'rsatish
-            console.log("Ism :", firstName);
-            console.log("Familiya :", lastName);
-            console.log("Yo'nalish :", direction);
-            console.log("Avatar fayli :", avatar ? avatar.filename : "Yuklanmagan");
-            console.log("Pasport fayli :", passport ? passport.filename : "Yuklanmagan");
-            console.log("Diplom fayli :", diplom ? diplom.filename : "Yuklanmagan");
-            console.log("Ilova fayli :", ilova ? ilova.filename : "Yuklanmagan");
+                user[field] = uploaded.filename;
+            };
+            replaceFile('avatar', avatar);
+            replaceFile('passport', passport);
+            replaceFile('diplom', diplom);
+            replaceFile('ilova', ilova);
 
             let result = await (await db).user.update(req.user.id, user);
             if (result.hasOwnProperty('error')) {

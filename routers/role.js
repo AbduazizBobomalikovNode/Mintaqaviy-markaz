@@ -7,7 +7,30 @@ const validate = require("../resurs/validate/role");
 var auth = require("../middlewire/auth");
 
 
-setTimeout(async () => { db = await db }, 100);
+
+// Har bir rol uchun vazifa nomlarini 2 ta so'rov bilan olib keladi (N+1 o'rniga).
+async function attachTaskNames(roles, every) {
+    const database = await db;
+    if (!roles.length) return roles;
+    const rhts = await database.RHT.getRHTForObj({ idrole: { $in: roles.map((r) => r.id) } });
+    const taskIds = [...new Set(rhts.map((el) => el.idtask))];
+    const tasks = taskIds.length ? await database.task.getTaskObj({ id: { $in: taskIds } }) : [];
+    const names = new Map(tasks.map((t) => [t.id, t.name]));
+    for (const role of roles) {
+        let text = '';
+        const own = rhts.filter((el) => el.idrole === role.id);
+        for (let i = 0; i < own.length; i++) {
+            const name = names.get(own[i].idtask) || '';
+            if ((i + 1) % every == 0) {
+                text += name + '....';
+                break;
+            }
+            text += name + ",";
+        }
+        role.tasks = text;
+    }
+    return roles;
+}
 
 let bolimlar = {
     update: true,
@@ -24,22 +47,7 @@ let bolimlar = {
 router.get("/", auth, async (req, res) => {
     let role = await (await db).role.getRoleAll();
     let roles = await (await db).role.getRoleAllFilter(0, 15);
-    for (let index = 0; index < roles.length; index++) {
-        let tasks = '';
-        const element = await (await db).RHT.getRHTForObj({ idrole: roles[index].id });
-        // console.log(element)
-        for (let index_last = 0; index_last < element.length; index_last++) {
-            const element_last = element[index_last];
-            let demo = await (await db).task.getTask(element_last.idtask);
-            // console.log(demo, element_last);
-            if ((index_last + 1) % 2 == 0) {
-                tasks += demo.name + '....';
-                break;
-            }
-            tasks += demo.name + ",";
-        }
-        roles[index].tasks = tasks;
-    }
+    await attachTaskNames(roles, 2);
     
     // if (req.user.rolePath.includes("/certifcate")) {
     //     bolimlar.certifcate = true;
@@ -85,22 +93,7 @@ router.get("/page/:page", auth, async (req, res) => {
     }
     let role = await (await db).role.getRoleAll();
     let roles = await (await db).role.getRoleAllFilter(page * 15 - 15, 15);
-    for (let index = 0; index < roles.length; index++) {
-        let tasks = '';
-        const element = await (await db).RHT.getRHTForObj({ idrole: roles[index].id });
-        // console.log(element)
-        for (let index_last = 0; index_last < element.length; index_last++) {
-            const element_last = element[index_last];
-            let demo = await (await db).task.getTask(element_last.idtask);
-            // console.log(demo, element_last);
-            if ((index_last + 1) % 3 == 0) {
-                tasks += demo.name + '....';
-                break;
-            }
-            tasks += demo.name + ",";
-        }
-        roles[index].tasks = tasks;
-    }
+    await attachTaskNames(roles, 3);
     // let bolimlar = {
     //     update: false,
     //     deletes: false,
@@ -174,10 +167,12 @@ router.get("/view/:id", auth, async (req, res) => {
             path: '/role'
         });
     }
+    const taskIds = tasks.map((el) => el.idtask);
+    const taskDocs = taskIds.length ? await (await db).task.getTaskObj({ id: { $in: taskIds } }) : [];
+    const taskById = new Map(taskDocs.map((t) => [t.id, t]));
     for (let index = 0; index < tasks.length; index++) {
-        const element = tasks[index];
-        let task = await (await db).task.getTask(element.idtask);
-        role[`vazifa-${index + 1}`] = task.name + `(${task.path})`;
+        const task = taskById.get(tasks[index].idtask);
+        if (task) role[`vazifa-${index + 1}`] = task.name + `(${task.path})`;
     }
     // let bolimlar = {
     //     role: false,
@@ -388,11 +383,20 @@ router.post('/update/:id', auth, async (req, res) => {
         });
     }
     // console.log(req.body);
-    let tasks = req.body.tasks;
-    if (req.body.hasOwnProperty('tasks') && req.body.tasks.length > 0) {
-        tasks = tasks.split(',').map((el) => { return parseInt(el) });
+    let tasks = req.body.tasks || '';
+    if (tasks.length > 0) {
+        tasks = tasks.split(',').map((el) => { return parseInt(el) }).filter((el) => Number.isInteger(el));
+    } else {
+        tasks = [];
     }
     let role = await (await db).role.getRole(id);
+    if (!role) {
+        return res.render('public/pages/erors/error-404', {
+            status: 404,
+            error: 'ushbu idga mos role to\'pilmadi!',
+            path: '/task'
+        });
+    }
 
     if (body.hasOwnProperty("name") && role.name != body.name) {
         let role_int = await (await db).role.getRoleForObj({ name: body.name });
@@ -440,7 +444,7 @@ router.post('/update/:id', auth, async (req, res) => {
             await (await db).RHT.addRHT(RHT);
         }
     }
-    if (req.body.tasks.length == 0) {
+    if (!req.body.tasks || req.body.tasks.length == 0) {
         for (let index = 0; index < RHTs.length; index++) {
             const element = RHTs[index];
             // console.log("deleting RHT " + element);

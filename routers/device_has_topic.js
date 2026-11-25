@@ -5,10 +5,8 @@ var db = require('../db/mongodb');
 var generateId = require('../resurs/functions/getid');
 const validate = require("../resurs/validate/DHT");
 var auth = require("../middlewire/auth");
-const { date } = require("joi");
 
 
-setTimeout(async () => { db = await db }, 100);
 
 router.get("/get/DHT/:id", auth, async (req, res) => {
     let id = parseInt(req.params.id);
@@ -72,7 +70,7 @@ router.post('/add', auth, async (req, res) => {
         return res.status(400).json({ error: 'ushbu  qiymatlar allaqachon kritilgan' });
     }
     let DHT = {
-        id: generateId(db, 8, "device_has_topic"),
+        id: await generateId(db, 8, "device_has_topic"),
         ...body
     }
 
@@ -89,16 +87,22 @@ router.post('/add', auth, async (req, res) => {
 })
 
 router.post('/update', auth, async (req, res) => {
-    console.log(req.body);
-    let body = req.body;
-    let topics = body.idtopic;
+    let body = req.body || {};
+    let topics = Array.isArray(body.idtopic) ? body.idtopic : [];
+    const iddevice = parseInt(body.iddevice);
+    if (!Number.isInteger(iddevice) || topics.length === 0 || topics.length > 500) {
+        return res.status(400).json({ error: "iddevice va idtopic (ro'yxat) noto'g'ri berildi" });
+    }
+    // Faqat mantiqiy qiymatlar qabul qilinadi (obyekt/operatorlar emas)
+    if (body.hasOwnProperty("published")) body.published = body.published === true || body.published === 'true';
+    if (body.hasOwnProperty("subscribed")) body.subscribed = body.subscribed === true || body.subscribed === 'true';
     for (let index = 0; index < topics.length; index++) {
         let element = {
-            iddevice: parseInt(body.iddevice),
+            iddevice: iddevice,
             idtopic: parseInt(topics[index]),
         }
+        if (!Number.isInteger(element.idtopic)) continue;
         let result = await (await db).DHT.getDHTForObj(element);
-        console.log(result);
         if (result.length > 0) { 
             if (body.hasOwnProperty("published")) {
                 await (await db).DHT.update(result[0].id, { published: body.published })
@@ -114,7 +118,6 @@ router.post('/update', auth, async (req, res) => {
                 subscribed: body.subscribed || false
             };
             await (await db).DHT.addDHT(DHT); 
-            console.log(DHT);
         }
     }
     await (await db).DHT.clear();

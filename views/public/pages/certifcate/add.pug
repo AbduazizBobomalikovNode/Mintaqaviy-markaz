@@ -1,5 +1,5 @@
 doctype html
-html(lang='en')
+html(lang='uz')
   head
     // Required meta tags
     meta(charset='utf-8')
@@ -19,19 +19,9 @@ html(lang='en')
     // endinject
     // Layout styles
     link(rel='stylesheet' href='../../assets/css/style.css')
+    link(rel='stylesheet' href='../../asserts/css/a11y.css')
     // End layout styles
     link(rel='shortcut icon' href='../../assets/images/favicon.png')
-    script.
-      window.onload = function () {
-      let title = document.title + " ✅";
-      let index = 0;
-      setInterval(function () {
-      index = (index + 1) % (title.length + 1);
-      if (index == 0) index = 1;
-      if (title.substring(index, title.length)[0] == ' ') index++;
-      document.title = title.substring(index, title.length) + title.substring(0, index);
-      }, 400);
-      };
   body
     .container-scroller
       // partial:partials/_sidebar.html
@@ -47,7 +37,6 @@ html(lang='en')
               .profile-pic
                 .count-indicator
                   img.img-xs.rounded-circle(src='../../assets/images/faces/images.jpg' alt='')
-                  span.count.bg-success
                 .profile-name
                   h5.mb-0.font-weight-normal #{user.name}
                   span #{user.role}

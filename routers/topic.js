@@ -8,7 +8,6 @@ var auth = require("../middlewire/auth");
 const User = require("../db/tables/user");
 
 
-setTimeout(async () => { db = await db }, 100);
 
 let bolimlar = {
     update: true,
