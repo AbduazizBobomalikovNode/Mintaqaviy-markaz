@@ -94,19 +94,25 @@ npm test               # 25 ta unit test (node:test)
 
 ## Xavfsizlik va cheklovlar
 
-> [!WARNING]
-> Repo tarixida avval kodga yozilgan MongoDB Atlas URI (parol bilan), JWT kaliti va SMS avtorizatsiya sarlavhasi, shuningdek `uploads/` dagi shaxsiy hujjatlar qolgan. Hozirgi kodda ularning birortasi yo'q, lekin **parollar va kalitlarni almashtirish** va tarixni `git filter-repo` bilan tozalash kerak.
+> [!NOTE]
+> Git tarixi 2026-11-26 da `git filter-repo` bilan tozalandi.
+> - Tarixdan o'chirilgan fayllar: `uploads/` dagi yuklangan hujjatlar (bo'sh `uploads/.gitkeep` qoldirildi) va `views/public/node_modules` (17 546 fayl). Repo hajmi 81 MB dan 44 MB ga tushdi.
+> - Kodga yozilgan MongoDB Atlas login va paroli, JWT kalitining zaxira qiymati va SMS `Authorization` sarlavhasi `***REMOVED***` bilan almashtirildi.
+> - Commit SHA'lari o'zgardi: eski klonlarni qayta klon qiling.
 
 Endi himoyalangan:
-- `/download` faqat kirgan foydalanuvchiga ochiq va `uploads/` dan tashqariga chiqa olmaydi.
-- `node_modules`, `gulp-tasks`, `pages`, `package.json` va `.pug` fayllar brauzerga berilmaydi.
+- `/download` faqat kirgan foydalanuvchiga ochiq va `uploads/` dan tashqariga chiqa olmaydi. `.gitkeep` kabi nuqta bilan boshlanadigan fayllar uchun 404 qaytadi.
+- `node_modules`, `gulp-tasks`, `pages`, `package.json` va `.pug` fayllar brauzerga berilmaydi. Yo'l tekshiruvdan oldin normallashtiriladi, shuning uchun `/x/../package.json` kabi aylanma yo'l ham 404 oladi.
 - Kirish so'rovlari faqat string qabul qiladi. Bu NoSQL injection'ni (`{"$ne":null}`) yopadi.
 - SMS kod `crypto.randomInt` bilan yaratiladi va tekshirishda doimiy vaqtli taqqoslash ishlatiladi.
 - Parol xeshi JWT'ga ham, javoblarga ham kirmaydi. Yangi va o'zgartirilgan parollar bcrypt bilan saqlanadi.
 - `X-Content-Type-Options`, `X-Frame-Options` va `Referrer-Policy` sarlavhalari qo'yildi, so'rov hajmi 1 MB bilan cheklandi.
 
 Hali qolgan:
-- **Rol huquqlari to'liq tekshirilmaydi.** Faqat "xodim yoki talaba" ajratiladi, rolga biriktirilgan yo'llar hisobga olinmaydi.
+- **Rol huquqlari to'liq tekshirilmaydi.** Faqat "xodim yoki talaba" ajratiladi (`staffOnly`), rolga biriktirilgan yo'llar hisobga olinmaydi. Hech qanday vazifasi yo'q xodim roli ham `/user`, `/role` va `/task` ga kira oladi.
+- **Bog'lanish qoldiqlari.** Rol yoki vazifa o'chirilganda `role_has_task` yozuvlari qoladi. Rolni tahrirlash o'chirilgan vazifalarni endi o'tkazib yuboradi, avval bu holatda 500 qaytardi.
+- **Holat kodlari.** Xato sahifalari 200 qaytaradi. Kirmagan foydalanuvchi ham 200 va JavaScript redirect oladi, 302 yoki 401 emas.
+- **SMS kirish** real provayder bilan sinalmagan.
 - **Eski parollar.** Bazada ochiq saqlangan eski parollar hali qabul qilinadi va birinchi kirishda xeshlanadi.
 - **Sertifikat yaratish ulanmagan.** `resurs/functions/pdf.js` va `routers/______certificate.js` (docxtemplater + QR) bor, lekin router `index.js` ga ulanmagan. `routers/topic.js` va `device_has_topic.js` ham ulanmagan.
 - **Rate limit xotirada ishlaydi.** U `req.ip` bo'yicha sanaydi, shuning uchun reverse proxy ortida `app.set('trust proxy', …)` kerak.
