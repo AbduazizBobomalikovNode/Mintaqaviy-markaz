@@ -331,7 +331,8 @@ router.get('/update/:id', auth, async (req, res) => {
     let RHTs = await (await db).RHT.getRHTRole(id);
     for (let index = 0; index < RHTs.length; index++) {
         const element = RHTs[index].idtask;
-        tasks_role.push((await (await db).task.getTask(element)).name);
+        const taskDoc = await (await db).task.getTask(element);
+        if (taskDoc) tasks_role.push(taskDoc.name); // o'chirilgan vazifa qoldig'i 500 bermasin
     }
     let tasks = await (await db).task.getTaskAll();
 

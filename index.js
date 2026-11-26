@@ -92,7 +92,10 @@ app.get("/download/:filename", auth, (req, res) => {
     }
     // res.download Content-Disposition ni xavfsiz kodlaydi
     res.download(filePath, path.basename(filePath), (e) => {
-      if (e && !res.headersSent) res.status(500).json({ message: "Faylni yuborib bo'lmadi" });
+      if (e && !res.headersSent) {
+        if (e.status === 404) return res.status(404).json({ message: "Fayl topilmadi" });
+        res.status(500).json({ message: "Faylni yuborib bo'lmadi" });
+      }
     });
   });
 });
@@ -100,7 +103,8 @@ app.get("/download/:filename", auth, (req, res) => {
 // Build/manba fayllari brauzerga berilmaydi (bog'liqliklar, gulp, pug shablonlari)
 app.use((req, res, next) => {
   let p;
-  try { p = decodeURIComponent(req.path); } catch (e) { return res.sendStatus(400); }
+  // "/x/../package.json" kabi shakllar static ichida normallashadi, shuning uchun avval normallashtiramiz
+  try { p = path.posix.normalize(decodeURIComponent(req.path).replace(/\\/g, "/")); } catch (e) { return res.sendStatus(400); }
   if (/^\/(node_modules|gulp-tasks|pages)(\/|$)|^\/(package(-lock)?\.json|gulpfile\.js)$|\.pug$/i.test(p)) {
     return res.sendStatus(404);
   }
